@@ -5,38 +5,26 @@ public class test
   {
     Scanner reader = new Scanner(System.in);  // Reading from System.in
     System.out.println("Enter size ");
-    int rows = reader.nextInt();
-    int cols = reader.nextInt();
-    s_matrix x = new s_matrix(rows,cols);
-
-    float count=0f;
-    for(int i=0;i<rows;i++)
+    String exp = reader.nextLine();
+    // System.out.println("Enter variable name : ");
+    // String var = reader.next();
+    // System.out.println("Enter value to be replaced : ");
+    // float val = reader.nextFloat();
+    s_expression e = new s_expression(exp);
+    s_variable_table variables = e.get_variables_table();
+    variables.print();
+    System.out.println("Before replacing "+e.get_expression());
+    // e.replace(var,val);
+    while(true)
     {
-      for(int j=0;j<cols;j++,count = count + 1f)
+      for(int i=0;i<variables.count;i++)
       {
-        System.out.println("\nEnter number : ");
+        System.out.println("Give value for  : "+variables.var_names.get(i));
         float f = reader.nextFloat();
-        x.set(i,j,f);
+        variables.add_variable(variables.var_names.get(i),Float.toString(f));
       }
+      variables.print();
+      System.out.println("Answer "+e.evaluate(variables)); 
     }
-    x.print();
-    System.out.println("Enter size ");
-    rows = reader.nextInt();
-    cols = reader.nextInt();
-    s_matrix y = new s_matrix(rows,cols);
-
-    count=0f;
-    for(int i=0;i<rows;i++)
-    {
-      for(int j=0;j<cols;j++,count = count + 1f)
-      {
-        System.out.println("\nEnter number : ");
-        float f = reader.nextFloat();
-        y.set(i,j,f);
-      }
-    }
-    y.print();
-    x.print();
-    s_matrix.multiply(x,y).print();
   }
 }
