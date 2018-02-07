@@ -3,6 +3,11 @@ public class s_matrix
   private int rows,columns;   // can be set only during construction
   private Float[][] elements;
 
+  public s_matrix()
+  {
+    this.rows = this.columns = 0;
+  }
+
   public s_matrix (int rows,int columns)
   {
     this.rows = rows;
@@ -11,16 +16,17 @@ public class s_matrix
       this.rows = 0;
     if(this.columns < 0)
       this.columns = 0;
-    elements = (Float[][]) new Object[rows][columns];
+    elements = new Float[rows][columns];
   }
 
   public void copy(s_matrix  arr)
   {
-    if( this.get_rows() != arr.get_rows() || this.get_columns() != arr.get_columns())
-      System.out.println("Copy is not possible as row and columns are not same.");
-    for(int i=0;i<get_rows();i++)
+    this.elements = new Float[arr.get_rows()][arr.get_columns()];
+    this.rows = arr.get_rows();
+    this.columns = arr.get_columns();
+    for(int i=0;i<arr.get_rows();i++)
     {
-      for(int j=0;j<get_columns();j++)
+      for(int j=0;j<arr.get_columns();j++)
         this.elements[i][j] = arr.get(i,j);
     }
   }
@@ -49,7 +55,10 @@ public class s_matrix
       this.elements[pos_x][pos_y] = val;
     }
     else
-      System.out.println("Invalid position.");
+    {
+        System.out.print("Invalid position." + pos_x);
+        System.out.println(" "+pos_y);
+    }
   }
 
   public float get(int pos_x,int pos_y)
@@ -126,15 +135,18 @@ public class s_matrix
     if(!(start_row >=0 && start_row < this.rows && end_row >=0 && end_row < this.rows && start_col >=0 && start_col < this.columns
         && end_col >=0 && end_col <this.columns && start_row <= end_row && start_col <= end_col))
     {
-      System.out.print("Invalid sub matrix boundaries.");
+      //System.out.print("Invalid sub matrix boundaries.");
       return new s_matrix (0,0);
     }
+
+  //  System.out.println("Getting matrix from rows "+Integer.toString(start_row)+" "+Integer.toString(end_row));
+  //  System.out.println("Getting matrix from cols "+Integer.toString(start_col)+" "+Integer.toString(end_col));
 
     s_matrix  temp = new s_matrix (end_row-start_row+1,end_col-start_col+1);
     for(int i=start_row;i<=end_row;i++)
     {
       for(int j=start_col;j<=end_col;j++)
-        temp.set(start_row-i,start_col-j,this.elements[i][j]);
+        temp.set(i-start_row,j-start_col,this.elements[i][j]);
     }
     return temp;
   }
@@ -142,7 +154,16 @@ public class s_matrix
   public void concat_horizontal(s_matrix  mat1,s_matrix  mat2)
   {
     if( mat1.get_rows() != mat2.get_rows())
-      System.out.println("Rows should be same for horizontal concatination.");
+    {
+    //  System.out.println("Rows should be same for horizontal concatination.");
+      if(mat1.get_rows() <=0 )
+      {
+        this.copy(mat2);
+      }
+      else
+        this.copy(mat1);
+      return;
+    }
     s_matrix  temp = new s_matrix (mat1.get_rows(),mat1.get_columns()+mat2.get_columns());
     for(int i=0;i<mat1.get_rows();i++)
     {
@@ -157,7 +178,16 @@ public class s_matrix
   public void concat_vertical(s_matrix  mat1,s_matrix  mat2)
   {
     if( mat1.get_columns() != mat2.get_columns())
-      System.out.println("Columns should be same for vertical concatination.");
+    {
+      //  System.out.println("Columns should be same for vertical concatination.");
+        if(mat1.get_columns() <= 0)
+        {
+          this.copy(mat2);
+        }
+        else
+          this.copy(mat1);
+        return;
+    }
     s_matrix  temp = new s_matrix (mat1.get_rows()+mat2.get_rows(),mat2.get_columns());
     for(int i=0;i<mat1.get_columns();i++)
     {
@@ -169,9 +199,27 @@ public class s_matrix
     this.copy(temp);
   }
 
-  public Float determinant()
+  public static Float determinant(s_matrix m)
   {
-    return null;
+    if(m.get_rows() == 2)
+    {
+      return m.get(0,0) * m.get(1,1) - m.get(1,0)*m.get(0,1);
+    }
+    s_matrix sub_mat = new s_matrix();
+    sub_mat.copy(m);
+    sub_mat.remove_row(0);
+    Float det= 0f;
+    for(int i=0;i<m.get_columns();i++)
+    {
+      s_matrix temp = new s_matrix();
+      temp.copy(sub_mat);
+      temp.remove_column(i);
+      Float ans = m.get(0,i) * s_matrix.determinant(temp);
+      if(i%2!=0)
+        ans *= -1f;
+      det += ans;
+    }
+    return det;
   }
 
 }
