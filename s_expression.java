@@ -9,8 +9,39 @@ public class s_expression
   private s_variable_table variables_table = new s_variable_table();
   private Map<Integer,String> local_map = new HashMap<Integer,String>();
   private Stack<String> post_fix_stack = new Stack<String>();
+
   public s_expression()
   {}
+    
+  public s_expression(String exp)
+  {
+    String t="";
+    for(int i=0;i<exp.length();i++)
+    {
+      if(exp.charAt(i)==' ')
+        continue;
+      t += exp.charAt(i);
+    }
+    // all white spaces are removed
+    // converting -x to 0-x type
+    exp = t;
+    t="";
+    for(int i=0;i<exp.length();i++)
+    {
+      if(exp.charAt(i)=='-')
+      {
+        if( i-1 <0 || operator(exp.charAt(i-1))!= 0)
+        {
+          t += Float.toString(0f);
+        }
+      }
+        t += exp.charAt(i);
+    }
+    System.out.println("Simplified expression is "+t);
+    this.expression = t;
+    this.post_fix();
+    //System.out.println("\nPost fix is "+this.post_fix_with_vars);
+  }
 
   private boolean isFloat(String str)
   {
@@ -24,6 +55,7 @@ public class s_expression
       return false;
     }
   }
+
   private Integer operator(Character c)
   {
     Character[] operators = {'+','-','*','/','^','(',')','$',' '};
@@ -195,36 +227,6 @@ public class s_expression
 
     //System.out.println("PostFix expression is "+post_fix_expression);
     this.post_fix_with_vars = post_fix_expression;
-  }
-
-  public s_expression(String exp)
-  {
-    String t="";
-    for(int i=0;i<exp.length();i++)
-    {
-      if(exp.charAt(i)==' ')
-        continue;
-      t += exp.charAt(i);
-    }
-    // all white spaces are removed
-    // converting -x to 0-x type
-    exp = t;
-    t="";
-    for(int i=0;i<exp.length();i++)
-    {
-      if(exp.charAt(i)=='-')
-      {
-        if( i-1 <0 || operator(exp.charAt(i-1))!= 0)
-        {
-          t += Float.toString(0f);
-        }
-      }
-        t += exp.charAt(i);
-    }
-    System.out.println("Simplified expression is "+t);
-    this.expression = t;
-    this.post_fix();
-    //System.out.println("\nPost fix is "+this.post_fix_with_vars);
   }
 
   public s_variable_table get_variables_table()
