@@ -26,8 +26,8 @@ public class s_expression
   }
   private Integer operator(Character c)
   {
-    Character[] operators = {'+','-','*','/','^','(',')','$'};
-    Integer[] precedence ={1,1,2,2,3,-1,-1,-2};
+    Character[] operators = {'+','-','*','/','^','(',')','$',' '};
+    Integer[] precedence ={1,1,2,2,3,-1,-1,-2,-4};
     for(int i=0;i<operators.length;i++)
       if(c == operators[i])
         return precedence[i];
@@ -199,7 +199,30 @@ public class s_expression
 
   public s_expression(String exp)
   {
-    this.expression = exp;
+    String t="";
+    for(int i=0;i<exp.length();i++)
+    {
+      if(exp.charAt(i)==' ')
+        continue;
+      t += exp.charAt(i);
+    }
+    // all white spaces are removed
+    // converting -x to 0-x type
+    exp = t;
+    t="";
+    for(int i=0;i<exp.length();i++)
+    {
+      if(exp.charAt(i)=='-')
+      {
+        if( i-1 <0 || operator(exp.charAt(i-1))!= 0)
+        {
+          t += Float.toString(0f);
+        }
+      }
+        t += exp.charAt(i);
+    }
+    System.out.println("Simplified expression is "+t);
+    this.expression = t;
     this.post_fix();
     //System.out.println("\nPost fix is "+this.post_fix_with_vars);
   }
