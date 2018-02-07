@@ -88,7 +88,7 @@ public class s_matrix
     for(int i=0;i<rows;i++)
     {
       for(int j=0;j<columns;j++)
-        System.out.print(elements[i][j]+" ");
+        System.out.printf("%.2f ",elements[i][j]);
       System.out.println();
     }
     System.out.println("-------------------------------------------------------");
@@ -105,6 +105,32 @@ public class s_matrix
     return temp;
   }
 
+  public s_matrix adjoint()
+  {
+    s_matrix ad_mat = new s_matrix(this.rows,this.columns);
+    int count = 0;
+    for(int i=0;i<this.rows;i++)
+    {
+      count = i%2;
+      for(int j=0;j<this.columns;j++)
+      {
+        s_matrix temp = new s_matrix();
+        temp.copy(this);
+        temp.remove_row(i);
+        temp.remove_column(j);
+        temp.print();
+        float ans = s_matrix.determinant(temp);
+        if(count %2 !=0)
+          ans *= -1f;
+        ad_mat.set(i,j,ans);
+        count++;
+      }
+    }
+    ad_mat.print();
+    ad_mat.copy(ad_mat.transpose());
+    return ad_mat;
+  }
+
   public void multiply(float val)
   {
     for(int i=0;i<get_rows();i++)
@@ -112,6 +138,17 @@ public class s_matrix
       for(int j=0;j<get_columns();j++)
       {
         set(i,j,this.get(i,j)*val);
+      }
+    }
+  }
+
+  public void add(float val)
+  {
+    for(int i=0;i<get_rows();i++)
+    {
+      for(int j=0;j<get_columns();j++)
+      {
+        set(i,j,this.get(i,j)+val);
       }
     }
   }
@@ -139,8 +176,8 @@ public class s_matrix
       return new s_matrix (0,0);
     }
 
-  //  System.out.println("Getting matrix from rows "+Integer.toString(start_row)+" "+Integer.toString(end_row));
-  //  System.out.println("Getting matrix from cols "+Integer.toString(start_col)+" "+Integer.toString(end_col));
+    //  System.out.println("Getting matrix from rows "+Integer.toString(start_row)+" "+Integer.toString(end_row));
+    //  System.out.println("Getting matrix from cols "+Integer.toString(start_col)+" "+Integer.toString(end_col));
 
     s_matrix  temp = new s_matrix (end_row-start_row+1,end_col-start_col+1);
     for(int i=start_row;i<=end_row;i++)
@@ -201,6 +238,8 @@ public class s_matrix
 
   public static Float determinant(s_matrix m)
   {
+    if(m.get_rows()==1)
+      return m.get(0,0);
     if(m.get_rows() == 2)
     {
       return m.get(0,0) * m.get(1,1) - m.get(1,0)*m.get(0,1);
@@ -220,6 +259,45 @@ public class s_matrix
       det += ans;
     }
     return det;
+  }
+
+  public static s_matrix inverse(s_matrix m)
+  {
+    Float det = s_matrix.determinant(m);
+    if(det == 0)
+    {
+      System.out.println("determinant is zero inverse not possible.");
+      return new s_matrix();
+    }
+    System.out.printf("determinant is %.2f\n",det);
+    s_matrix transposed = m.adjoint();
+    System.out.println("\nTransposed matrix is ");
+    transposed.print();
+    transposed.multiply(1/det);
+    return transposed;
+  }
+
+  public static s_matrix multiply(s_matrix mat1,s_matrix mat2)
+  {
+    if(mat1.get_columns() != mat2.get_rows())
+    {
+      System.out.println("Multiplication not possible.");
+      return new s_matrix();
+    }
+    s_matrix ans = new s_matrix(mat1.get_rows(),mat2.get_columns());
+    for(int i=0;i<mat1.get_rows();i++)
+    {
+      for(int j=0;j<mat2.get_columns();j++)
+      {
+        float cal = 0f;
+        for(int k=0;k<mat1.get_columns();k++)
+        {
+          cal += mat1.get(i,k) * mat2.get(k,j);
+        }
+        ans.set(i,j,cal);
+      }
+    }
+    return ans;
   }
 
 }
