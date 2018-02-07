@@ -12,7 +12,7 @@ public class s_expression
 
   public s_expression()
   {}
-    
+
   public s_expression(String exp)
   {
     String t="";
@@ -166,6 +166,9 @@ public class s_expression
                     break;
           case "/":
                     ans = n1/n2;
+                    break;
+          case "^":
+                    ans = (float)java.lang.Math.pow(n1,n2);
                     break;
         }
         local_stack.push(ans);
